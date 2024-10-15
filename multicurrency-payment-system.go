@@ -1,35 +1,41 @@
-package main
+package mucupa
 
 import (
-    "log"
-    "net/http"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-func main() {
-    http.HandleFunc("/api/pay", paymentHandler)
-    log.Println("Server started on :8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+func MethodHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("test success")
 }
 
-func paymentHandler(w http.ResponseWriter, r *http.Request) {
-    req, err := JSONBodyHandler(w, r)
-    if err != nil {
-        return
-    }
+/*
+func QuoteHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("quote success")
+}
+*/
 
-    rate, err := GetExchangeRate(req.Currency)
-    if err != nil {
-        http.Error(w, "Failed to get exchange rate", http.StatusInternalServerError)
-        return
-    }
+var config Configuration
 
-    convertedAmount := req.Amount * rate
-    response := map[string]interface{}{
-        "success":        true,
-        "convertedAmount": convertedAmount,
-        "currency":      req.Currency,
-    }
+func MuxInit(conf Configuration) *mux.Router {
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
+	config = conf
+
+	// create a new router with the specified listener functions
+	rtr := mux.NewRouter()
+	rtr.HandleFunc("/test", MethodHandler).Methods("GET")
+	rtr.HandleFunc("/quote", QuoteHandler).Methods("POST")
+	http.Handle("/", rtr)
+
+	// start listening on port 3000
+	err := http.ListenAndServe(":3000", nil)
+
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+		fmt.Printf("ListenAndServe:%s\n", err.Error())
+	}
+	return rtr
 }
