@@ -1,8 +1,14 @@
-package main
+package mucupa
 
 import (
-    "net/http"
-    "encoding/json"
+	"fmt"
+	"net/http"
 )
 
-// Reuse GetExchangeRate from cryptsy-quote.go here if necessary
+func QuoteHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("quote success")
+	// read body
+	// j := jsonBodyUnmarshal(r)
+	// do cryptsy stuff
+	CryptsyGetMarket("61")
+}
