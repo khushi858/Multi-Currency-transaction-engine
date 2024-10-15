@@ -1,22 +1,30 @@
-package main
+package mucupa
 
 import (
-    "encoding/json"
-    "net/http"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
-type PaymentRequest struct {
-    Amount   float64 `json:"amount"`
-    Currency string  `json:"currency"`
-}
+func jsonBodyUnmarshal(r *http.Request) interface{} {
 
-func JSONBodyHandler(w http.ResponseWriter, r *http.Request) (*PaymentRequest, error) {
-    var req PaymentRequest
-    decoder := json.NewDecoder(r.Body)
-    err := decoder.Decode(&req)
-    if err != nil {
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
-        return nil, err
-    }
-    return &req, nil
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	var j interface{}
+
+	if err != nil {
+		fmt.Println("body error")
+		fmt.Println(err)
+	} else {
+		fmt.Println("bodyBytes: ", bodyBytes)
+		bodyString := string(bodyBytes[:])
+		fmt.Println("bodyString: ", bodyString)
+		err := json.Unmarshal(bodyBytes, &j)
+		if err == nil {
+			// do stuff
+		}
+
+	}
+	return j
+
 }
