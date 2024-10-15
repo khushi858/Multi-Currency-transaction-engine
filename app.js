@@ -1,35 +1,20 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    const currencySelects = document.querySelectorAll("select");
-    const convertButton = document.getElementById("convertButton");
-    const resultDiv = document.getElementById("result");
+document.getElementById('quoteRequest').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const currency = document.getElementById('currency').value;
+    const amount = document.getElementById('amount').value;
 
-    // Fetch currency data
-    async function fetchCurrencies() {
-        const response = await fetch("http://localhost:8080/api/currencies");
-        const currencies = await response.json();
-        currencies.forEach(currency => {
-            const optionFrom = document.createElement("option");
-            optionFrom.value = currency.code;
-            optionFrom.textContent = currency.code;
-
-            const optionTo = optionFrom.cloneNode(true);
-
-            currencySelects[0].appendChild(optionFrom);
-            currencySelects[1].appendChild(optionTo);
-        });
-    }
-
-    // Convert currency
-    async function convertCurrency() {
-        const amount = document.getElementById("amount").value;
-        const fromCurrency = document.getElementById("fromCurrency").value;
-        const toCurrency = document.getElementById("toCurrency").value;
-
-        const response = await fetch(`http://localhost:8080/api/convert?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`);
-        const result = await response.json();
-        resultDiv.textContent = `${amount} ${fromCurrency} = ${result.convertedAmount} ${toCurrency}`;
-    }
-
-    convertButton.addEventListener("click", convertCurrency);
-    await fetchCurrencies();
+    fetch('/quote/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ currency, amount })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('quoteResponse').innerHTML = JSON.stringify(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 });
