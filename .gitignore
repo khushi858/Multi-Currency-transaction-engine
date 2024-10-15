@@ -1,0 +1,9 @@
+# Ignore binary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go binary
+/bin/
